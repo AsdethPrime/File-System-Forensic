@@ -1,0 +1,30 @@
+Why file system?
+----------------
+
+When Linux Kernel needs to conduct an I/O operation to one of your system storage devices the kernel needs to know:
+1) Where that data is stored
+2) How can it access it, and 
+3) Where it is safe to write other new information
+
+This is the job of a file system.
+
+So when you use a file browser or maybe a cd command on the command prompt, this is made possible because of the file system. 
+
+
+So what is ext2?
+----------------
+
+ext2 is one of the oldest linux file systems that is still available. It stores data in a hierarchical format. This is actually found in just about every file system in existence today. It does not have to be this way, but it just is because of the convinence it provides ( that's however for a different day ). 
+
+Few key statistics
+=> Max file size = 2 TB
+=> Max Volume = 4 TB
+=> File name size = 255 characters
+
+ext2 is super stable but has one key weakness, ext2 takes forever to recover if the system shuts down abruptly. 
+
+When shutting down Linux the OS needs to first cleanly dismount the file system. This ensures that all pending file system transactions are actually committed to disk before the system shuts down. The problem arises when the system shuts down without completing this, leading to the possibility that some pending transactions were not committed. If this happens, ext2 runs a program, ext2fschk on the whole disk to find and recover from the pending transactions. Because it has to scan the whole disk it takes forever. 
+
+This raise to the rise of ext3 that makes use of journaling. Before committing a transaction to disk th ext3 file system will record that transaction to the journal and mark it as pending or incomplete. After the process is complete, the ext3 marks the transaction as completed. By doing this ext3 file system can keep a log of the most recent file transactions and whether or not they were actually completed. 
+
+
