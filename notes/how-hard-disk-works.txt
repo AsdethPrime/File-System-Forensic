@@ -1,0 +1,15 @@
+Exposing the internal architecture of a typical hard disk drive contains 4 major components:
+1) Disk platter
+2) Head Arm
+3) Chassis
+4) Head Actuator
+
+The chassis is the part of hard disk that acts as a base and provides physical support to it. The chasis is the part of hard drive over which other parts are placed.
+
+Platters are the circular disks located one above the other and mounted on a central pole known as spindle. The platters are specially coated each side with a coating which enables them to store data in a magnetic form. Data is stored in concentric circles on both upper and lower surfaces of the platter and these circles are referred to as tracks. Each track is divided into individual sections called sectors. 
+
+When a disk is powered on and the system needs to read or write data , platters spin at a very high speed which enables the correct part of the disk to be read through the actuator arm and components associated with it. 
+
+In order to actualy read data from or write to a disk tiny device called read/write head needs to be positioned just above the platter surface. In order to position the head correctly it is located on the end of the head arm. Strictly speaking, the read/write head is attached to a head slider which in turn is attached to the head arm. 
+
+Head arms are joined together in a structure referred to as actuator arm. In order to position the correct place on the platters the actuator pivots on an axis which allows the heads to move across the platter surface. This action together with the rotation of the platter itself allow the head to be positioned correctly. 
