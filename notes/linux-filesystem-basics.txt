@@ -1,0 +1,47 @@
+These notes are from the paper " An analysis of EXt4 for Digital Forensic" by Kevin Fairbanks (2012)
+
+
+File System Basics
+-----------------
+
+The basic unit of work for most hard disk is the sector which is usually 512 bytes in size. File system on the other hand tend to operate on units that are composed of multiple sector called blocks. These blocks are organized into logical units called block groups. Each block group, with the possible exception of the last, has an equal amount of data blocks and inodes.  
+
+An inode stores basic metadata information about a file such as time stamps, users and groups, permissions as well as pointers to data blocks. As every file must have a unique inode the number of files that a system can support is limit not only by the amount of free data blocks but by the total number of inodes available. 
+
+
+Linux File System basics 
+------------------------
+
+In ext filesystem, not all blocks are equal. Along with data blocks the filesystem uses group descriptors, inode, data block bitmaps, inode table and a file system superblock. 
+
+Superblock is a metadata repository for the entire filesystem. It contains information such as the total number of blocks and inode in the filesystem, the number of block for block groups, the number of available blocks in the filesystem as well as the first inode available. 
+
+A group descriptor contains meta information about a particular block group, the blocks included in the group, and the offset of key blocks into the group. Each group has an inode bitmap and a data block bitmap. 
+
+In ext an inode is 128 bytes in size by default. inodes are store sequentially in a structure called the inode table that is present in each group. The size of inode table is related to the block size the file system uses. 
+
+Upon file deletion, ext2 marks inode associated with the deleted file as available by editing its inode and datablock bitmaps. This practice make it possible to recover a deleted file if its content have not been overwritten as the inode structure will contain pointers to data blocks. Ext3 in contarst performs the additional step of overwritting block pointers in the inode structure upon deletion. These increases the difficulty of file recovery and requires the use of techniques known as data carving to reconstruct the file. 
+
+
+Journaling
+----------
+
+Journaling is a technique employed by file systems in crash recovery. It offers reduced recovery time at the cost of additional filesystem overhead in terms of time and/or space. The journal, in ext3, takes on the form of a fixed size log that regularly overwrites itself. Actions are recorded to the journal and either replayed in its entirety or not all during file system recovery. This feature is called atomicity and allows ext3 to come to a consistent state more quickly than through the file system check program such as e2fsck. 
+
+With ext3 the actual journaling action is handled seperately from the file system by journal bnlock device. The ext3 filesystem is used to identify transaction which are then passed to the journal block device to be recovered. A transaction is a set of updates sent to the device which are uniquely identified by a sequence nunber. The transaction sequence number is used in the descriptor and commit blocks to denote the start and end of the transaction respectively. The data that is being journaled is nested between the descriptor and commit blocks. The descriptor block also contains a list of the fiel system blocks that are updated during transaction. IT is important to note that the comit block is also created once the file system data has been recorded to disk to ensure atomicity. 
+
+There also exists a revoke block. This is like the descriptor block, has a sequence of number and a list of file system blocks, but its purpose is to prevent changes during the recover process. Any file system block listed in the revoke block is not restored. 
+
+The next structure that the journal uses is probably one of the most important, the superblock. This should not be confused with the filesystem superblock, as this is specific to the journal. This structure has the task of identifying the first descriptor block in the journal. The usage of journal as a circular log makes this task necessary, as it cannot be assumed that the beginning of the journal is located at the beginning of its physical storage space. 
+
+The three documented modes of journaling are:
+1) Journal 
+2) Ordered 
+3) Writeback
+
+The journal mode, while certainly being the safest method, is the most constly of the 3 in regards to the performance. It writes both the file data and the metadata to the journal and then copies the information to the actual filesystem area on the disk.
+
+To above writing twice, ordered mode only writes metadata to the journal. In this mode care must be taken to write to the fiel system disk area before writing to the journal area. In most Linux distro, ordered mode is the default in which the journal operates. 
+
+In writeback mode only metadata is journaled, but no precaution is followed to ensure data is written to file system area first. 
+ 
